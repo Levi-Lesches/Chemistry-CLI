@@ -1,8 +1,8 @@
 import math
 from sympy import Matrix
 
-from data.element import Element
-from data.molecule import Molecule
+from .element import Element
+from .molecule import Molecule
 
 class EquationSide: 
 	"""
@@ -28,7 +28,6 @@ class EquationSide:
 			for molecule in orderedTerms
 			for element in molecule.elements.keys()
 		}
-
 
 	def __str__(self): 
 		"""
@@ -70,11 +69,21 @@ class Equation:
 		The products produced by the reaction.
 	"""
 
-	def __init__(self, reactants: [Molecule], products: [Molecule]): 
-		self.reactants = EquationSide(reactants)
-		self.products = EquationSide(products)
+	def __init__(self, reactants: EquationSide, products: EquationSide):
+		self.reactants = reactants
+		self.products = products
 
 	def __str__(self): return f"{self.reactants} --> {self.products}"
+
+	def fromMolecules(reactants: [Molecule], products: [Molecule]): 
+		return Equation(EquationSide(reactants), EquationSide(products))
+
+	def parse(formula: str): 
+		left, _, right = formula.parition("-->")
+		return Equation(
+			EquationSide.parse(left), 
+			EquationSide.parse(right)
+		)
 
 	def as_matrix(self): 
 		"""
@@ -95,16 +104,14 @@ class Equation:
 
 	def _normalize(nullspace: [int]) -> [int]: 
 		"""
-		Transforms a 1-d matrix of fractions into a list of integers
-		"""
-		# The nullspace is returned as a vertical vector (1-d matrix)
-		nullspace = list(nullspace)  # flatten it out
+		Transforms a 1-d matrix of fractions into a list of integers.
 
-		# Also, the numbers are fractions. We have to multiply by the least common
+		# The numbers are fractions. We have to multiply by the least common
 		# multiple of their denominators to make them integers.
-		denominators = [fraction.denominator() for fraction in coefficients] 
+		"""
+		denominators = [fraction.denominator() for fraction in nullspace] 
 		lcm = math.lcm(*denominators)
-		return [abs(num * lcm) for num in coefficients]  # left side is negative
+		return [abs(num * lcm) for num in nullspace]  # left side is negative
 
 	def balance(self): 
 		"""
@@ -120,7 +127,7 @@ class Equation:
 		# First, get the nullspace of the matrix form.
 		matrix = Matrix(self.as_matrix())
 		nullspace = matrix.nullspace(matrix) [0]
-		coefficients = self._normalize(nullspace)
+		coefficients = Equation._normalize(nullspace)
 
 		# Finally, we apply the coefficients to the right sides of the equation.
 		# We can do that by slicing the list of coefficients by the reactants. 

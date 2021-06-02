@@ -1,4 +1,4 @@
-from data.element import Element
+from .element import Element
 
 # TODO: Implement Molecule.fromFormula
 
