@@ -20,7 +20,7 @@ class EquationSide:
 	def __init__(self, orderedTerms: [Molecule]): 
 		self.orderedTerms = orderedTerms
 		self.terms = { 
-			molecule: None
+			molecule: 1
 			for molecule in orderedTerms
 		}
 		self.elements = {
@@ -38,15 +38,19 @@ class EquationSide:
 			for molecule, coefficient in self.terms.items()
 		)
 
+	def parse(string): 
+		return EquationSide([
+			Molecule.parse(molecule)
+			for molecule in string.split(" + ")
+		])
+
 	def get_element_counts(self, element: Element) -> [int]: 
 		"""
 		Returns how many of an element there are in each term.
-
-		Since this is used for balancing, it ignores current coefficients.
 		"""
 		return [
-			molecule.elements.get(element, 0)
-			for molecule in self.orderedTerms
+			molecule.elements.get(element, 0) * coefficient
+			for molecule, coefficient in self.terms.items()
 		]
 
 	def apply_coefficients(self, coefficients: [int]): 
@@ -72,6 +76,7 @@ class Equation:
 	def __init__(self, reactants: EquationSide, products: EquationSide):
 		self.reactants = reactants
 		self.products = products
+		if not self._verify(): raise ValueError(f"Invalid equation: {self}")
 
 	def __str__(self): return f"{self.reactants} --> {self.products}"
 
@@ -79,11 +84,14 @@ class Equation:
 		return Equation(EquationSide(reactants), EquationSide(products))
 
 	def parse(formula: str): 
-		left, _, right = formula.parition("-->")
+		left, _, right = formula.partition("-->")
 		return Equation(
 			EquationSide.parse(left), 
 			EquationSide.parse(right)
 		)
+
+	def _verify(self): 
+		return self.reactants.elements == self.products.elements
 
 	def as_matrix(self): 
 		"""
@@ -134,3 +142,10 @@ class Equation:
 		numReactants = len(self.reactants.terms)
 		self.reactants.apply_coefficients(coefficients [:numReactants]) 
 		self.products.apply_coefficients(coefficients [numReactants:])
+
+	def is_balanced(self): 
+		for element in self.reactants.elements: 
+			amount_reactants = sum(self.reactants.get_element_counts(element))
+			amount_products = sum(self.products.get_element_counts(element))
+			if (amount_reactants != amount_products): return False
+		else: return True
