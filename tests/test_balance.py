@@ -1,6 +1,7 @@
-from chemistry.lib.element import Element
-from chemistry.lib.molecule import Molecule
-from chemistry.lib.equation import Equation
+if __package__ is None: 
+	quit("Do not open this file directly. Use pytest")
+
+from lib.equation import Equation
 
 TESTS = [
 	"H2 + O2 --> H2O",
@@ -46,4 +47,4 @@ def test_balance():
 		assert equation.is_balanced(), f"Couldn't balance {equation}"
 
 if __name__ == "__main__": 
-	test()
+	test_balance()
