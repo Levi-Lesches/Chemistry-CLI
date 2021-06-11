@@ -2,8 +2,8 @@ from lib.equation import Equation
 
 try: 
 	equation = Equation.parse(input("Enter a chemical equation to balance: "))
-except ValueError as error: 
-	print("Invalid equation. Make sure each element is represented on both sides.")
+except Exception as error: 
+	print(f"ERROR: {error.msg}")
 	quit()
 
 equation.balance()
