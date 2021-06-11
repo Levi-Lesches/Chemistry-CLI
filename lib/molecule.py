@@ -46,6 +46,6 @@ class Molecule:
 
 		for (element, amount) in Molecule.regex.findall(filtered_string): 
 			amount = int(amount) if amount else 1
-			_update_elements(element, amount)
+			_update_elements(Element(element), amount)
 
 		return Molecule(elements, string = molecule)
