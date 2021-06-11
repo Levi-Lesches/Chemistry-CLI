@@ -39,6 +39,7 @@ class EquationSide:
 		)
 
 	def parse(string): 
+		"""Parses one side of a chemical equation"""
 		return EquationSide([
 			Molecule.parse(molecule)
 			for molecule in string.split(" + ")
@@ -81,10 +82,14 @@ class Equation:
 	def __str__(self): return f"{self.reactants} --> {self.products}"
 
 	def fromMolecules(reactants: [Molecule], products: [Molecule]): 
+		"""Initializes an equation from the molecules on both sides"""
 		return Equation(EquationSide(reactants), EquationSide(products))
 
 	def parse(formula: str): 
+		"""Parses a string representation of an equation"""
 		left, _, right = formula.partition("-->")
+		if not left or not right: 
+			raise SyntaxError("Make sure your equation is of the form: H2 + O2 --> H2O")
 		return Equation(
 			EquationSide.parse(left), 
 			EquationSide.parse(right)
@@ -144,6 +149,10 @@ class Equation:
 		self.products.apply_coefficients(coefficients [numReactants:])
 
 	def is_balanced(self): 
+		"""
+		Checks if this equation is balanced by comparing the elements on both sides.
+		"""
+
 		for element in self.reactants.elements: 
 			amount_reactants = sum(self.reactants.get_element_counts(element))
 			amount_products = sum(self.products.get_element_counts(element))
