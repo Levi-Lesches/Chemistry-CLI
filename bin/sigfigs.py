@@ -69,10 +69,18 @@ def evaluate(expression: str) -> str:
 	return result
 
 if __name__ == "__main__": 
-	print("NOTE: Order of operations are not implemented. Use parentheses if needed")
-	print("NOTE: All operators are limited to two operands. Use parentheses when needed")
-	print("  Example: 1 + (2 + 3) instead of 1 + 2 + 3")
-	print()
-	expression = input("Enter an expression: ")
-	print()
-	print(evaluate(expression))
+	print("Enter 1 to count sigfigs, or 2 to evaluate an arithmetic expression")
+	choice = int(input())
+	if choice == 1: 
+		num = input("Enter a number: ")  # do NOT use float() here
+		print(f"That number has {get_sigfigs(num)} significant figures")
+	elif choice == 2: 
+		print("NOTE: Order of operations are not implemented. Use parentheses if needed")
+		print("NOTE: All operators are limited to two operands. Use parentheses when needed")
+		print("  Example: 1 + (2 + 3) instead of 1 + 2 + 3")
+		print()
+		expression = input("Enter an expression: ")
+		print()
+		print(evaluate(expression))
+	else: 
+		print("Only options 1 or 2 are supported")
